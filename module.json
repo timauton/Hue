@@ -1,0 +1,87 @@
+{
+    "author" : "Ludovic.F, Tim Auton",
+    "category" : "support_external_dev",
+    "singleton": true,
+    "maturity" : "beta",
+    "version" : "0.98",
+    "moduleName" : "Hue",
+    "dependencies": [],
+    "homepage": "http://razberry.z-wave.me",
+    "icon": "icon.png",
+    "repository": {
+      "type": "git",
+      "source": "https://github.com/Z-Wave-Me/"
+    },
+    "defaults": {
+        "title": "__m_title__",
+        "description": "__m_descr__"
+    },
+    "schema": {
+      "type": "object",
+      "required": true,
+      "properties" : {
+        "ip": {
+          "type": "string",
+          "required": true
+        },
+        "key": {
+            "format": "string",
+            "required": true
+        },                                                     
+        "importScenes": {
+            "type": "boolean",
+            "required": false,
+            "default" : false
+        },
+        "forceSwitchMultilevel": {
+            "type": "boolean",
+            "required": false,
+            "default" : false
+        },
+        "noSwitch": {
+            "type": "boolean",
+            "required": false,
+            "default" : true
+        },
+        "transitionTime": {
+            "type": "integer",
+            "required": true,
+            "minimum": 1,
+            "maximum": 255,
+            "default" : 4
+        }
+      }
+    },
+    "options": {
+        "fields" : {
+          "ip": {
+              "label": "IP",
+              "placeholder": "Enter local bridge ip like: 192.168.1.10"
+          },
+          "key": {
+              "label": "Bridge Key",
+              "placeholder": "Enter Bridge Access Key"
+          }, 
+          "importScenes": {
+              "type": "checkbox",
+              "rightLabel": "Import All Scenes",
+              "helper": "Import All Scenes by Group Define With Hue App"
+          },
+          "forceSwitchMultilevel": {
+              "type": "checkbox",
+              "rightLabel": "Force MultiLevel Switch",
+              "helper": "Force all device to Switch MultiLevel (Change Brightness without Color)"
+          },
+          "noSwitch": {
+              "type": "checkbox",
+              "rightLabel": "Don't Create Switch / Turn Off At Zero",
+              "helper": "Do not create a separate switch, instead turn off when dimmer set to zero"
+          },
+          "transitionTime": {
+          		"type": "integer",
+          		"rightLabel": "Transition time",
+          		"helper": "Time to transition between brightness levels, in tenths of a second (e.g. 4 means 0.4s)."
+          }
+        }
+    }
+}
