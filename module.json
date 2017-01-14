@@ -6,11 +6,11 @@
     "version" : "0.98",
     "moduleName" : "Hue",
     "dependencies": [],
-    "homepage": "http://razberry.z-wave.me",
+    "homepage": "https://github.com/timauton/Hue",
     "icon": "icon.png",
     "repository": {
       "type": "git",
-      "source": "https://github.com/Z-Wave-Me/"
+      "source": "https://github.com/timauton/Hue"
     },
     "defaults": {
         "title": "__m_title__",
@@ -79,7 +79,7 @@
           },
           "transitionTime": {
           		"type": "integer",
-          		"rightLabel": "Transition time",
+          		"label": "Transition time",
           		"helper": "Time to transition between brightness levels, in tenths of a second (e.g. 4 means 0.4s)."
           }
         }
