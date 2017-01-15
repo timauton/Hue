@@ -257,6 +257,9 @@ Hue.prototype.createHueMultilevelDevice = function(type, number, name, uniqueid,
         },
         moduleId: this.id
     });
+    if (self.config.homebridgeSkip) {
+		vDev.addTag("Homebridge.Skip");
+	}
 };
 
 /*

@@ -46,6 +46,11 @@
             "required": false,
             "default" : true
         },
+        "homebridgeSkip": {
+            "type": "boolean",
+            "required": false,
+            "default" : true
+        },
         "transitionTime": {
             "type": "integer",
             "required": true,
@@ -78,6 +83,11 @@
               "type": "checkbox",
               "rightLabel": "Don't Create Switch / Turn Off At Zero",
               "helper": "Do not create a separate switch, instead turn off when dimmer set to zero"
+          },
+          "homebridgeSkip": {
+              "type": "checkbox",
+              "rightLabel": "Add a Homebridge.Skip tag to all elements",
+              "helper": "This avoids duplicates as Hue devices will also appear in Homekit via the Hue hub."
           },
           "transitionTime": {
           		"type": "integer",
