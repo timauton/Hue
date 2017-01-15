@@ -14,7 +14,10 @@
     },
     "defaults": {
         "title": "__m_title__",
-        "description": "__m_descr__"
+        "description": "__m_descr__",
+    	"ip":"192.168.0.3",
+    	"key":"Ms70tiMzzsVbhNEVM9Hz-QUkRcgZGMtJtYLOej8g",
+    	"transitionTime":4
     },
     "schema": {
       "type": "object",
@@ -26,7 +29,7 @@
         },
         "key": {
             "format": "string",
-            "required": true
+            "required": false
         },                                                     
         "importScenes": {
             "type": "boolean",
@@ -47,8 +50,7 @@
             "type": "integer",
             "required": true,
             "minimum": 1,
-            "maximum": 255,
-            "default" : 4
+            "maximum": 255
         }
       }
     },
@@ -59,12 +61,12 @@
               "placeholder": "Enter local bridge ip like: 192.168.1.10"
           },
           "key": {
-              "label": "Bridge Key",
-              "placeholder": "Enter Bridge Access Key"
+              "label": "__l_key__",
+              "helper": "__h_key__"
           }, 
           "importScenes": {
               "type": "checkbox",
-              "rightLabel": "Import All Scenes",
+              "rightLabel": "__l_import_scenes__",
               "helper": "Import All Scenes by Group Define With Hue App"
           },
           "forceSwitchMultilevel": {

@@ -2,5 +2,7 @@
     "m_title": "Philips Hue",
     "m_descr": "HUE is a new way to use your Philips Hue SmartHome solution's. Use this app as a remote to switch colors, turn up the brightness, quickly toggle lights on and off. For the moment you have to create yourcredential manually. <br><br> Installation Instruction:<br><ul><li> Go on http://YourBridgeIpAddress/debug/clip.html</li><li> Enter {&#34;devicetype&#34;:&#34;SmartHome#RasberryPi Zway&#34;} in MessageBody part</li><li> Go and press the button on the bridge. </li><li> Press the POST button on clip.html page and you should get a success response </li> <li> Congratulations you have just created an authorized user(like: 1028 d66426293e821ecfd9ef1a0731df), which we'll use from now on. </li> <li> Fill your key in Hue app! </li></ul><br> To create your own key, see more details on <a href=http://www.developers.meethue.com/documentation/getting-started>www.developers.meethue.com/documentation/getting-started</a>",
     "l_ip": "Bridge IP",
-    "l_key": "API Key"
+    "l_key": "API Key",
+    "h_key": "Optional. If left blank you must press the button on your Hue hub just before pressing save below.",
+    "l_import_scenes": "Import All Scenes"
 }
