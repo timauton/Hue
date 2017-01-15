@@ -403,7 +403,7 @@ Hue.prototype.refreshAllHueLights = function(self) {
         data: {},
         async: true,
         success: function(rsp) {
-        	console.log(JSON.stringify(rsp));
+        	//console.log(JSON.stringify(rsp));
         	for (var lightId in rsp.data) {
         					
 				var filterId = "_lights_" + lightId;
@@ -416,7 +416,7 @@ Hue.prototype.refreshAllHueLights = function(self) {
 
 				filterArray.forEach(function(device) {
 					//console.log("Hue refreshing " + device.id);
-					self.refreshHueLight(device,lightId,rsp);
+					self.refreshHueLight(self, device, lightId, rsp);
 				});
 			}
         },
@@ -427,7 +427,7 @@ Hue.prototype.refreshAllHueLights = function(self) {
 
 };
 
-Hue.prototype.refreshHueLight = function(device,lightId,rsp) {
+Hue.prototype.refreshHueLight = function(self,device,lightId,rsp) {
 
     var res = device.id.split("_");
 	var subType = (res.length>4) ? res[4] : null;
