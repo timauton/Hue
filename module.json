@@ -14,10 +14,7 @@
     },
     "defaults": {
         "title": "__m_title__",
-        "description": "__m_descr__",
-    	"ip":"192.168.0.3",
-    	"key":"Ms70tiMzzsVbhNEVM9Hz-QUkRcgZGMtJtYLOej8g",
-    	"transitionTime":4
+        "description": "__m_descr__"
     },
     "schema": {
       "type": "object",
@@ -36,16 +33,6 @@
             "required": false,
             "default" : false
         },
-        "forceSwitchMultilevel": {
-            "type": "boolean",
-            "required": false,
-            "default" : false
-        },
-        "noSwitch": {
-            "type": "boolean",
-            "required": false,
-            "default" : true
-        },
         "homebridgeSkip": {
             "type": "boolean",
             "required": false,
@@ -54,8 +41,7 @@
         "transitionTime": {
             "type": "integer",
             "required": true,
-            "minimum": 1,
-            "maximum": 255
+            "minimum": 1
         }
       }
     },
@@ -73,16 +59,6 @@
               "type": "checkbox",
               "rightLabel": "__l_import_scenes__",
               "helper": "Import All Scenes by Group Define With Hue App"
-          },
-          "forceSwitchMultilevel": {
-              "type": "checkbox",
-              "rightLabel": "Force MultiLevel Switch",
-              "helper": "Force all device to Switch MultiLevel (Change Brightness without Color)"
-          },
-          "noSwitch": {
-              "type": "checkbox",
-              "rightLabel": "Don't Create Switch / Turn Off At Zero",
-              "helper": "Do not create a separate switch, instead turn off when dimmer set to zero"
           },
           "homebridgeSkip": {
               "type": "checkbox",
