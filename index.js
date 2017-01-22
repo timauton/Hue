@@ -400,39 +400,44 @@ Hue.prototype.sendAction = function(self, deviceId, command, action) {
         async: true,
         success: function(rsp) {
             console.log("PhilipsHue Send Action Success:" + JSON.stringify(rsp.data));
-            var values = rsp.data[0];
-            if (values.success != undefined) {
-                for (var key in values.success) {
-                	switch (key) {
-                    	case thisKey + "/on":
-                    		if (subType == "col" || subType == "onOff") {
-                        		currentDevice.set("metrics:level", (success[key] == true) ? "on" : "off");
-                        	}
-                        	break;
-                        case thisKey + "/hue":
-                        	currentDevice.set("metrics:level",self.fromBriSat(success[key]));
-                        	break;
-                        case thisKey + "/bri":
-                        	currentDevice.set("metrics:level",self.fromBriSat(success[key]));
-                        	break;
-                        case thisKey + "/sat":
-                        	currentDevice.set("metrics:level",self.fromBriSat(success[key]));
-                        	break;
-                        case thisKey + "/ct":
-                        	currentDevice.set("metrics:level",self.fromCt(success[key]));
-                        	break;
-                    	case thisKey + "/xy":
-							// perform command execute le handler de create device (!! boucle infini !!) i lfaut utuliser set.
-							//device.performCommand('exact', { red: 255, green: 255, blue: 255 });
-							break;
-                    	case thisKey + "/scene":
-							self.refreshAllHueLights(self);
-							break;
-                    }
-                }
-            } else {
-                self.controller.addNotification("error", "Hue " + JSON.stringify(values), "connection", "Hue");
-            }
+            for (var dat in rsp.data) {
+            	var values = rsp.data[dat];
+				if (values.success) {
+					for (var key in values.success) {
+						switch (key) {
+							case thisKey + "/on":
+								if (subType == "col" || subType == "onOff") {
+									currentDevice.set("metrics:level", (values.success[key] == true) ? "on" : "off");
+								}
+								if (subType == "bri" && values.success[key] == false) {
+									currentDevice.set("metrics:level",0);
+								}
+								break;
+							case thisKey + "/hue":
+								currentDevice.set("metrics:level",self.fromHueVal(values.success[key]));
+								break;
+							case thisKey + "/bri":
+								currentDevice.set("metrics:level",self.fromBriSatVal(values.success[key]));
+								break;
+							case thisKey + "/sat":
+								currentDevice.set("metrics:level",self.fromBriSatVal(values.success[key]));
+								break;
+							case thisKey + "/ct":
+								currentDevice.set("metrics:level",self.fromCtVal(values.success[key]));
+								break;
+							case thisKey + "/xy":
+								// perform command execute le handler de create device (!! boucle infini !!) i lfaut utuliser set.
+								//device.performCommand('exact', { red: 255, green: 255, blue: 255 });
+								break;
+							case thisKey + "/scene":
+								self.refreshAllHueLights(self);
+								break;
+						}
+					}
+				} else {
+					self.controller.addNotification("error", "Hue " + JSON.stringify(values), "connection", "Hue");
+				}
+			}
         },
         error: function(rsp) {
             console.log("PhilipsHue Send Action Error : " + JSON.stringify(action));
