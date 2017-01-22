@@ -2,8 +2,8 @@
     "author" : "Ludovic.F, Tim Auton",
     "category" : "support_external_dev",
     "singleton": true,
-    "maturity" : "beta",
-    "version" : "0.98",
+    "maturity" : "stable",
+    "version" : "1.0",
     "moduleName" : "Hue",
     "dependencies": [],
     "homepage": "https://github.com/timauton/Hue",
@@ -14,7 +14,8 @@
     },
     "defaults": {
         "title": "__m_title__",
-        "description": "__m_descr__"
+        "description": "__m_descr__",
+        "transitionTime": 4
     },
     "schema": {
       "type": "object",
@@ -29,6 +30,21 @@
             "required": false
         },                                                     
         "importScenes": {
+            "type": "boolean",
+            "required": false,
+            "default" : false
+        },
+        "createHueSat": {
+            "type": "boolean",
+            "required": false,
+            "default" : true
+        },
+        "createXY": {
+            "type": "boolean",
+            "required": false,
+            "default" : false
+        },
+        "dontSendOn": {
             "type": "boolean",
             "required": false,
             "default" : false
@@ -48,8 +64,8 @@
     "options": {
         "fields" : {
           "ip": {
-              "label": "IP",
-              "placeholder": "Enter local bridge ip like: 192.168.1.10"
+              "label": "__l_ip__",
+              "placeholder": "__p_ip__"
           },
           "key": {
               "label": "__l_key__",
@@ -58,17 +74,32 @@
           "importScenes": {
               "type": "checkbox",
               "rightLabel": "__l_import_scenes__",
-              "helper": "Import All Scenes by Group Define With Hue App"
+              "helper": "__h_import_scenes__"
+          },
+          "createHueSat": {
+              "type": "checkbox",
+              "rightLabel": "__l_create_hue_sat__",
+              "helper": "__h_create_hue_sat__"
+          },
+          "createXY": {
+              "type": "checkbox",
+              "rightLabel": "__l_create_xy__",
+              "helper": "__h_create_xy__"
+          },
+          "dontSendOn": {
+              "type": "checkbox",
+              "rightLabel": "__l_dont_send_on__",
+              "helper": "__h_dont_send_on__"
           },
           "homebridgeSkip": {
               "type": "checkbox",
-              "rightLabel": "Add a Homebridge.Skip tag to all elements",
-              "helper": "This avoids duplicates as Hue devices will also appear in Homekit via the Hue hub."
+              "rightLabel": "__l_homebridge_skip__",
+              "helper": "__h_homebridge_skip__"
           },
           "transitionTime": {
           		"type": "integer",
-          		"label": "Transition time",
-          		"helper": "Time to transition between brightness levels, in tenths of a second (e.g. 4 means 0.4s)."
+          		"label": "__l_transition_time__",
+          		"helper": "__h_transition_time__"
           }
         }
     }

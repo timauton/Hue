@@ -1,8 +1,22 @@
 {
     "m_title": "Philips Hue",
-    "m_descr": "<p>Module to control Phillips Hue lights.</p><p>To find the IP address of your Hue bridge, open the Hue app, got to Settings > Hue bridges > Click on the i > Network Settings > Turn off DHCP. You do not need to save the changes to the network settings, but if your router regularly changes IP addresses you may want to save the manual settings.</p><p>If you have an API key you can enter it in the box below. If you have no idea what an API key is leave it blank - but you must press the button on your Hue bridge just before pressing Save.</p>",
+    "m_descr": "<p>Module to control Phillips Hue lights.</p><p>To find the IP address of your Hue bridge, open the Hue app, got to Settings > Hue bridges > Click on the i > Network Settings > Turn off DHCP. You do not need to save the changes to the network settings, but if your router regularly changes IP addresses you may want to save the manual settings.</p><p>If you have an API key you can enter it in the box below. If you have no idea what an API key is leave it blank - but you must press the button on your Hue bridge just before pressing Save.</p><p>For colour devices you can choose to use Hue and Saturation controls or the colour palette (or both). The advantage of the Hue and Saturation controls is that you can add them to scenes. A good way to choose colours to use in scenes is to pick a colour using the colour palette or the Hue app, then wait a few seconds for the right Hue and Saturation controls to be refreshed from the bridge. You will then know the right Hue and Saturation values to use in your scene.</p>",
     "l_ip": "Bridge IP",
     "l_key": "API Key",
     "h_key": "Optional. If left blank you must press the button on your Hue hub just before pressing save below.",
-    "l_import_scenes": "Import All Scenes"
+    "l_import_scenes": "Import All Scenes",
+    "h_import_scenes":"Import All Scenes by Group Define With Hue App",
+    "l_ip": "IP Address of your Hue bridge",
+    "p_ip":"Enter local bridge ip like: 192.168.1.10",
+    "l_create_hue_sat":"Create Hue and Saturation controls for colour lights",
+    "h_create_hue_sat":"This is a more complicated way to pick colours, but you can add these controls to scenes.",
+    "l_create_xy":"Create XY colour picker control for colour lights",
+    "h_create_xy":"This is a fun way to pick colours, but you cannot use this directly in a scene.",
+    "l_dont_send_on":"Don't send on command if device is already on",
+    "h_dont_send_on":"Helps reduce network traffic.",
+    "l_homebridge_skip":"Add a Homebridge.Skip tag to all elements",
+    "h_homebridge_skip":"This only makes sense if you use Homebridge to connect to Apple's Homekit. This option avoids duplicates as Hue devices will also appear in Homekit via the Hue hub.",
+    "l_transition_time":"Transition time",
+    "h_transition_time":"Time to transition between brightness levels, in tenths of a second (e.g. 4 means 0.4s)."
+    
 }

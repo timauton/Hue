@@ -127,6 +127,24 @@ Hue.prototype.createDevices = function(self, jsonData) {
     console.log("Hue Create Devices");
     var moduleName = "Hue";
     var deviceLights = jsonData.lights;
+    var deviceGroups = jsonData.groups;
+    
+    // build a map of lights to rooms
+    var lightLocations = [];
+    for (var group in deviceGroups) {
+    	var locId = 0;
+    	for (var loc in self.controller.locations) {
+    		if (self.controller.locations[loc].title == deviceGroups[group].name) {
+    			locId = self.controller.locations[loc].id;
+    		}
+    	}
+    	for (var lightId in deviceGroups[group].lights) {
+    		console.log("Hue : Light " + deviceGroups[group].lights[lightId] + " is in location " + locId);
+    		lightLocations[deviceGroups[group].lights[lightId]] = locId;
+    	}
+    }
+    
+    // add the lights
     for (var lightId in deviceLights) {
         var on = deviceLights[lightId].state.on;
         var bri = (on) ? self.fromBriSatVal(deviceLights[lightId].state.bri) : 0;
@@ -136,23 +154,36 @@ Hue.prototype.createDevices = function(self, jsonData) {
         var name = deviceLights[lightId].name;
         var uniqueid = deviceLights[lightId].uniqueid;
 		var reachable = deviceLights[lightId].state.reachable;
+		var loc = lightLocations[lightId];
         
         switch (deviceLights[lightId].type) {
         	case  "Color temperature light":
-				self.createHueMultilevelDevice("lights", lightId, name, uniqueid, reachable, "bri", bri);
-				self.createHueMultilevelDevice("lights", lightId, name + " Color Temperature", uniqueid, reachable, "ct", ct);
+				self.createHueMultilevelDevice("lights", lightId, name, uniqueid, reachable, "bri", bri, loc);
+				self.createHueMultilevelDevice("lights", lightId, name + " Color Temperature", uniqueid, reachable, "ct", ct, loc);
 				break;
 			case "Extended color light":
-				self.createHueMultilevelDevice("lights", lightId, name + " Color Temperature", uniqueid, reachable, "ct", ct);
-				// intentional fallthrough
+				self.createHueMultilevelDevice("lights", lightId, name, uniqueid, reachable, "bri", bri, loc);
+				self.createHueMultilevelDevice("lights", lightId, name + " Color Temperature", uniqueid, reachable, "ct", ct, loc);
+				if (self.config.createHueSat) {
+					self.createHueMultilevelDevice("lights", lightId, name + " Hue", uniqueid, reachable, "hue", hue, loc);
+					self.createHueMultilevelDevice("lights", lightId, name + " Saturation", uniqueid, reachable, "sat", sat, loc);
+				}
+				if (self.config.createXY) {
+					self.createHueColorDevice("lights", lightId, name + " Color", uniqueid, reachable, "col", loc);
+				}
+				break;
 			case "Color light":
-				self.createHueMultilevelDevice("lights", lightId, name, uniqueid, reachable, "bri", bri);
-				self.createHueMultilevelDevice("lights", lightId, name + " Hue", uniqueid, reachable, "hue", hue);
-				self.createHueMultilevelDevice("lights", lightId, name + " Saturation", uniqueid, reachable, "sat", sat);
-				self.createHueColorDevice("lights", lightId, name + " Color", uniqueid, reachable, "col");
+				self.createHueMultilevelDevice("lights", lightId, name, uniqueid, reachable, "bri", bri, loc);
+				if (self.config.createHueSat) {
+					self.createHueMultilevelDevice("lights", lightId, name + " Hue", uniqueid, reachable, "hue", hue, loc);
+					self.createHueMultilevelDevice("lights", lightId, name + " Saturation", uniqueid, reachable, "sat", sat, loc);
+				}
+				if (self.config.createXY) {
+					self.createHueColorDevice("lights", lightId, name + " Color", uniqueid, reachable, "col", loc);
+				}
 				break;
 			case "Dimmable light":
-				self.createHueMultilevelDevice("lights", lightId, name, uniqueid, reachable, "bri", self.fromBriSatVal(brightness));
+				self.createHueMultilevelDevice("lights", lightId, name, uniqueid, reachable, "bri", bri, loc);
 				break;
 			case "On/Off light":
 				// TODO: write createHueOnOffDevice
@@ -160,7 +191,6 @@ Hue.prototype.createDevices = function(self, jsonData) {
         }
     }
 
-	/*
     if (self.config.importScenes) {
         var deviceGroups = jsonData.groups;
         var deviceScenes = jsonData.scenes;
@@ -175,10 +205,9 @@ Hue.prototype.createDevices = function(self, jsonData) {
             }
         }
     }
-    */
 };
 
-Hue.prototype.createHueMultilevelDevice = function(type, number, name, uniqueid, reachable, subType, level) {
+Hue.prototype.createHueMultilevelDevice = function(type, number, name, uniqueid, reachable, subType, level, loc) {
 
     var self = this;
 	
@@ -221,37 +250,36 @@ Hue.prototype.createHueMultilevelDevice = function(type, number, name, uniqueid,
             if (command === "off") self.sendAction(self, deviceId, "state", { "on": false, "transitiontime": self.config.transitionTime });
             if (command === "exact") {
                 var currentDevice = self.controller.devices.get(deviceId);
-                subType = currentDevice.get("metrics:subType");
+                var subType = currentDevice.get("metrics:subType");
+                var dontSendOn = (self.config.dontSendOn && currentDevice.get("metrics:level") != 0);
+                var jsonCmd;
                 
                 console.log("subType is : " + subType);
                 
                 switch (subType) {
                 	case "bri":
 						if (args.level == 0) {
-							self.sendAction(self, deviceId, "state", 
-								{ "on": false, "transitiontime": self.config.transitionTime }
-							);
+							jsonCmd = { "on": false, "transitiontime": self.config.transitionTime };
 						} else {
-							self.sendAction(self, deviceId, "state",
-								{ "on": true, "bri": self.toBriSatVal(args.level), "transitiontime": self.config.transitionTime }
-							);
+							if (dontSendOn) {
+								jsonCmd = { "bri": self.toBriSatVal(args.level), "transitiontime": self.config.transitionTime };
+							} else {
+								jsonCmd = { "on": true, "bri": self.toBriSatVal(args.level), "transitiontime": self.config.transitionTime };
+							}
 						}
 						break;
 					case "ct":
-						self.sendAction(self, deviceId, "state",
-							{ "ct": self.toCtVal(args.level), "transitiontime": self.config.transitionTime }
-						);
+						jsonCmd = { "ct": self.toCtVal(args.level), "transitiontime": self.config.transitionTime };
 						break;
 					case "sat":
-						self.sendAction(self, deviceId, "state",
-							{ "sat": self.toBriSatVal(args.level), "transitiontime": self.config.transitionTime }
-						);
+						jsonCmd = { "sat": self.toBriSatVal(args.level), "transitiontime": self.config.transitionTime };
 						break;
 					case "hue":
-						self.sendAction(self, deviceId, "state",
-							{ "hue": self.toHueVal(args.level), "transitiontime": self.config.transitionTime }
-						);
+						jsonCmd = { "hue": self.toHueVal(args.level), "transitiontime": self.config.transitionTime };
 						break;
+				}
+				if (jsonCmd) {
+					self.sendAction(self, deviceId, "state", jsonCmd);
 				}
             }
         },
@@ -260,9 +288,10 @@ Hue.prototype.createHueMultilevelDevice = function(type, number, name, uniqueid,
     if (self.config.homebridgeSkip) {
 		vDev.addTag("Homebridge.Skip");
 	}
+	vDev.set("location",loc);
 };
 
-Hue.prototype.createHueColorDevice = function(type, number, name, uniqueid, reachable, subType ) {
+Hue.prototype.createHueColorDevice = function(type, number, name, uniqueid, reachable, subType, loc ) {
 
     var self = this;
     
@@ -292,11 +321,18 @@ Hue.prototype.createHueColorDevice = function(type, number, name, uniqueid, reac
         overlay: {},
         handler: function(command, args) {
             //console.log("Hue Color Handler " + name + "(" + type + id + ")-> Command(" + command + ") Args(" + args + ")");
-            if (command === "on") self.sendAction(self, deviceId, "state", { "on": true });
-            if (command === "off") self.sendAction(self, deviceId, "state", { "on": false });
+            if (command === "on") self.sendAction(self, deviceId, "state", { "on": true, "transitiontime": self.config.transitionTime });
+            if (command === "off") self.sendAction(self, deviceId, "state", { "on": false, "transitiontime": self.config.transitionTime });
             if (command === "exact") {
+            	var currentDevice = self.controller.devices.get(deviceId);
+                var dontSendOn = (self.config.dontSendOn && currentDevice.get("metrics:level") == "on");
+                
                 var xy = self.toXY(args.red, args.green, args.blue);
-                self.sendAction(self, deviceId, "state", { "on": true, "xy": xy, "transitiontime": self.config.transitionTime });
+                if (dontSendOn) {
+                	self.sendAction(self, deviceId, "state", { "xy": xy, "transitiontime": self.config.transitionTime });
+                } else {
+                	self.sendAction(self, deviceId, "state", { "on": true, "xy": xy, "transitiontime": self.config.transitionTime });
+                }
             }
             // TODO - make this update from the response
             self.controller.devices.get(deviceId).set("metrics:color",{"r":parseInt(args.red),"g":parseInt(args.green),"b":parseInt(args.blue)});
@@ -306,35 +342,38 @@ Hue.prototype.createHueColorDevice = function(type, number, name, uniqueid, reac
     if (self.config.homebridgeSkip) {
 		vDev.addTag("Homebridge.Skip");
 	}
+	vDev.set("location",loc);
 };
 
-/*
-TODO rewrite to use new sendAction
 Hue.prototype.createGroupSceneDevice = function(type, grpId, grpName, sceneId, sceneName, lights) {
 
     var self = this;
 
     console.log("Hue CreateGroupSceneDevice " + grpName + "(" + type + grpId + ")-> sceneId(" + sceneName + " " + sceneId + ")");
 
+	var deviceId = "Hue_" + this.id + "_" + type + "_" + grpId + "_" + sceneId;
+
     var vDev = self.controller.devices.create({
-        deviceId: "Hue_" + this.id + "_" + type + "_" + grpId + "_" + sceneId,
+        deviceId: deviceId,
         defaults: {
             deviceType: "toggleButton",
             metrics: {
                 title: grpName + " " + sceneName,
                 icon: "",
                 level: "off",
-                lights: lights
+                lights: lights,
+                type: "groups",
+                number: grpId,
+                subType: "scene"
             }
         },
         overlay: {},
         handler: function(command, args) {
-            if (command === "on") self.sendAction(type, grpId, { "scene": sceneId }, "action", sceneId);
+            if (command === "on") self.sendAction(self, deviceId, "action", { "scene": sceneId });
         },
         moduleId: this.id
     });
 };
-*/
 
 Hue.prototype.sendAction = function(self, deviceId, command, action) {
 
@@ -348,7 +387,8 @@ Hue.prototype.sendAction = function(self, deviceId, command, action) {
     var thisKey
 		= "/" + currentDevice.get("metrics:type")
 		+ "/" + currentDevice.get("metrics:number")
-		+ "/state";
+		+ "/" + command;
+	var subType = currentDevice.get("metrics:subType");
 
     console.log("PhilipsHue Http sendAction-> " + url + " Action:" + JSON.stringify(action));
 
@@ -365,31 +405,38 @@ Hue.prototype.sendAction = function(self, deviceId, command, action) {
                 for (var key in values.success) {
                 	switch (key) {
                     	case thisKey + "/on":
-                        	currentDevice.set("metrics:level", (success[key] == true) ? "on" : "off");
+                    		if (subType == "col" || subType == "onOff") {
+                        		currentDevice.set("metrics:level", (success[key] == true) ? "on" : "off");
+                        	}
+                        	break;
+                        case thisKey + "/hue":
+                        	currentDevice.set("metrics:level",self.fromBriSat(success[key]));
                         	break;
                         case thisKey + "/bri":
-                        	currentDevice.set("metrics:level",success[key]);
+                        	currentDevice.set("metrics:level",self.fromBriSat(success[key]));
+                        	break;
+                        case thisKey + "/sat":
+                        	currentDevice.set("metrics:level",self.fromBriSat(success[key]));
+                        	break;
+                        case thisKey + "/ct":
+                        	currentDevice.set("metrics:level",self.fromCt(success[key]));
                         	break;
                     	case thisKey + "/xy":
 							// perform command execute le handler de create device (!! boucle infini !!) i lfaut utuliser set.
 							//device.performCommand('exact', { red: 255, green: 255, blue: 255 });
 							break;
                     	case thisKey + "/scene":
-							var arrayLight = device.get("metrics:lights");
-							arrayLight.forEach(function(element) {
-								var devLight = self.controller.devices.get("Hue_" + self.id + "_lights_" + element);
-								devLight.set("metrics:level", "on");
-							});
+							self.refreshAllHueLights(self);
 							break;
                     }
                 }
             } else {
-                self.controller.addNotification("error", "PhilipsHue " + JSON.stringify(values), "connection", "Hue");
+                self.controller.addNotification("error", "Hue " + JSON.stringify(values), "connection", "Hue");
             }
         },
         error: function(rsp) {
             console.log("PhilipsHue Send Action Error : " + JSON.stringify(action));
-            self.controller.addNotification("error", "PhilipsHue Send Action Error", "connection", "Hue");
+            self.controller.addNotification("error", "Hue Send Action Error", "connection", "Hue");
         },
         complete: function(rsp) {
             //console.log("PhilipsHue Finished Send Action"); 
@@ -443,6 +490,9 @@ Hue.prototype.refreshHueLight = function(self,device,lightId,rsp) {
 	var newLevel;
 	
 	switch (subType) {
+		case "hue":
+			newLevel = self.fromHueVal(rsp.data[lightId].state.hue);
+			break;
 		case "bri":
 			newLevel = self.fromBriSatVal(rsp.data[lightId].state.bri);
 			if (!rsp.data[lightId].state.on) {
@@ -457,9 +507,6 @@ Hue.prototype.refreshHueLight = function(self,device,lightId,rsp) {
 			break;
 		case "ct":
 			newLevel = self.fromCtVal(rsp.data[lightId].state.ct);
-			break;
-		case "hue":
-			newLevel = self.fromHueVal(rsp.data[lightId].state.hue);
 			break;
 		// TODO: read back X,Y values for RGB bulbs
 		default:
