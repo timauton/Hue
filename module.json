@@ -3,7 +3,7 @@
     "category" : "support_external_dev",
     "singleton": true,
     "maturity" : "stable",
-    "version" : "1.0",
+    "version" : "1.1",
     "moduleName" : "Hue",
     "dependencies": [],
     "homepage": "https://github.com/timauton/Hue",
@@ -15,7 +15,8 @@
     "defaults": {
         "title": "__m_title__",
         "description": "__m_descr__",
-        "transitionTime": 4
+        "transitionTime": 4,
+        "slowdownDelay": 1
     },
     "schema": {
       "type": "object",
@@ -58,7 +59,17 @@
             "type": "integer",
             "required": true,
             "minimum": 1
-        }
+        },
+		"slowdownDelay": {
+            "type": "integer",
+            "required": false,
+            "minimum": 1
+        },
+        "extraHueTag": {
+            "type": "boolean",
+            "required": false,
+            "default" : true
+        }        
       }
     },
     "options": {
@@ -100,6 +111,16 @@
           		"type": "integer",
           		"label": "__l_transition_time__",
           		"helper": "__h_transition_time__"
+          },
+		  "slowdownDelay": {
+              "type": "integer",
+              "label": "__l_slowdown_delay__",
+              "helper": "__h_slowdown_delay__"
+          },
+          "extraHueTag": {
+              "type": "checkbox",
+              "rightLabel": "__l_extra_huetag__",
+              "helper": "__h_extra_huetag__"
           }
         }
     }

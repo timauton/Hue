@@ -39,7 +39,7 @@ Hue.prototype.init = function(config) {
     
     this.timer = setInterval(function() {
 		self.refreshAllHueLights(self);
-    }, 30 * 1000);
+    }, 15000 * 1000);
 };
 
 Hue.prototype.stop = function() {
@@ -289,6 +289,8 @@ Hue.prototype.createHueMultilevelDevice = function(type, number, name, uniqueid,
 		vDev.addTag("Homebridge.Skip");
 	}
 	vDev.set("location",loc);
+	vDev.addTag("HUE");
+
 };
 
 Hue.prototype.createHueColorDevice = function(type, number, name, uniqueid, reachable, subType, loc ) {
@@ -343,6 +345,7 @@ Hue.prototype.createHueColorDevice = function(type, number, name, uniqueid, reac
 		vDev.addTag("Homebridge.Skip");
 	}
 	vDev.set("location",loc);
+	vDev.addTag("HUE");
 };
 
 Hue.prototype.createGroupSceneDevice = function(type, grpId, grpName, sceneId, sceneName, lights) {
@@ -392,6 +395,10 @@ Hue.prototype.sendAction = function(self, deviceId, command, action) {
 
     console.log("PhilipsHue Http sendAction-> " + url + " Action:" + JSON.stringify(action));
 
+	//wait loop because hue gateway can be too slow sometimes
+	var waitUntil = new Date().getTime() + 0.1*1000;
+    while(new Date().getTime() < waitUntil) true;
+    
     http.request({
         url: url,
         method: "PUT",
