@@ -17,6 +17,9 @@
     "l_homebridge_skip":"Add a Homebridge.Skip tag to all elements",
     "h_homebridge_skip":"This only makes sense if you use Homebridge to connect to Apple's Homekit. This option avoids duplicates as Hue devices will also appear in Homekit via the Hue hub.",
     "l_transition_time":"Transition time",
-    "h_transition_time":"Time to transition between brightness levels, in tenths of a second (e.g. 4 means 0.4s)."
-    
+    "h_transition_time":"Time to transition between brightness levels, in tenths of a second (e.g. 4 means 0.4s).",
+    "l_slowdown_delay":"Delay to slow down Hue bridge",
+    "h_slowdown_delay":"Hue bridge has problems if commands a being send to quickly. So simply delay a little bit (e.g. 1 means 0.1s).",
+    "l_extra_huetag":"Add extra 'HUE' Tag",
+    "h_extra_huetag":"This tag helps quickly identifying all hue devices in the UI. Specially useful if you have a lot."
 }
